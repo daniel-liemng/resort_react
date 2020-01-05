@@ -1,6 +1,11 @@
 import React, { Component } from "react";
 
-import items from "./data";
+// import items from "./data";
+import Client from "./Contentful";
+// test contentful
+// Client.getEntries({
+//   content_type: "beachResort"
+// }).then(res => console.log(res.items));
 
 const RoomContext = React.createContext();
 // Provider: hold info
@@ -25,35 +30,72 @@ class RoomProvider extends Component {
   };
 
   // getData
+  getData = async () => {
+    try {
+      let res = await Client.getEntries({
+        content_type: "beachResort",
+        // order: "sys.createdAt"
+        order: "-fields.price"
+      });
+      // items here is import from data.js and are formated cleaner
+      let rooms = this.formatData(res.items);
+
+      // console.log("component did mount", rooms);
+      let featuredRooms = rooms.filter(room => room.featured === true);
+
+      // set maxPrice is the biggest price in data
+      let maxPrice = Math.max(...rooms.map(item => item.price));
+      // console.log(maxPrice);
+
+      // set maxSize is the biggest size in data
+      let maxSize = Math.max(...rooms.map(item => item.size));
+      // console.log(maxSize);
+
+      // update state
+      this.setState({
+        rooms,
+        sortedRooms: rooms,
+        featuredRooms,
+        loading: false,
+        price: maxPrice,
+        maxPrice,
+        maxSize
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // update state when mounting
   componentDidMount() {
     // THIS.GETDATA later
+    this.getData();
 
-    // items here is import from data.js and are formated cleaner
-    let rooms = this.formatData(items);
+    // USE Contentful INSTEAD
+    // // items here is import from data.js and are formated cleaner
+    // let rooms = this.formatData(items);
 
-    // console.log("component did mount", rooms);
-    let featuredRooms = rooms.filter(room => room.featured === true);
+    // // console.log("component did mount", rooms);
+    // let featuredRooms = rooms.filter(room => room.featured === true);
 
-    // set maxPrice is the biggest price in data
-    let maxPrice = Math.max(...rooms.map(item => item.price));
-    // console.log(maxPrice);
+    // // set maxPrice is the biggest price in data
+    // let maxPrice = Math.max(...rooms.map(item => item.price));
+    // // console.log(maxPrice);
 
-    // set maxSize is the biggest size in data
-    let maxSize = Math.max(...rooms.map(item => item.size));
-    // console.log(maxSize);
+    // // set maxSize is the biggest size in data
+    // let maxSize = Math.max(...rooms.map(item => item.size));
+    // // console.log(maxSize);
 
-    // update state
-    this.setState({
-      rooms,
-      sortedRooms: rooms,
-      featuredRooms,
-      loading: false,
-      price: maxPrice,
-      maxPrice,
-      maxSize
-    });
+    // // update state
+    // this.setState({
+    //   rooms,
+    //   sortedRooms: rooms,
+    //   featuredRooms,
+    //   loading: false,
+    //   price: maxPrice,
+    //   maxPrice,
+    //   maxSize
+    // });
   }
 
   // items here is params of function

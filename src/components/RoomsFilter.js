@@ -17,7 +17,6 @@ const RoomsFilter = ({ rooms }) => {
     price,
     minPrice,
     maxPrice,
-    size,
     minSize,
     maxSize,
     breakfast,
